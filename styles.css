@@ -1,0 +1,28 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Evita scrolls dobles */
+    background-color: #fff;
+}
+
+/* El toolbar ocupa lo necesario, no se reduce */
+.editor-toolbar {
+    flex-shrink: 0;
+}
+
+/* El wrapper de CodeMirror toma el espacio restante */
+.CodeMirror {
+    flex-grow: 1 !important;
+    height: 100% !important;
+    border-bottom: none !important;
+    border-left: none !important;
+    border-right: none !important;
+}
+
+/* Para asegurar que el contenedor general del editor se adapte */
+.editor-statusbar {
+    flex-shrink: 0;
+}

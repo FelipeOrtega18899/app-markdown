@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Markdown Editor</title>
+    <!-- SimpleMDE CSS -->
+    <link rel="stylesheet" href="node_modules/simplemde/dist/simplemde.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <textarea id="editor"></textarea>
+    
+    <!-- SimpleMDE JS -->
+    <script src="node_modules/simplemde/dist/simplemde.min.js"></script>
+    <script>
+        // Inicializar SimpleMDE
+        const simplemde = new SimpleMDE({ 
+            element: document.getElementById('editor'),
+            spellChecker: false, // Opcional: deshabilita el corrector por defecto
+            autofocus: true
+        });
+        
+        let currentFilePath = null;
+
+        // Limpiar escuchas previas (buena práctica en recargas)
+        if (window.electronAPI.removeListeners) {
+            window.electronAPI.removeListeners();
+        }
+
+        // Listener para la solicitud de guardado (vía IPC desde main.js)
+        window.electronAPI.onRequestSave(async () => {
+            const content = simplemde.value();
+            const result = await window.electronAPI.saveFile(content, currentFilePath);
+            if (result && result.success && result.filePath) {
+                currentFilePath = result.filePath;
+                document.title = `Markdown Editor - ${currentFilePath}`;
+            }
+        });
+
+        // Listener para cargar archivo abierto (vía IPC desde main.js)
+        window.electronAPI.onFileOpened((event, content, filePath) => {
+            simplemde.value(content);
+            currentFilePath = filePath;
+            document.title = `Markdown Editor - ${currentFilePath}`;
+        });
+        
+        // Listener para opciones de formato desde el menú
+        window.electronAPI.onFormat((event, action) => {
+            if (action === 'bold') simplemde.toggleBold();
+            if (action === 'italic') simplemde.toggleItalic();
+        });
+
+        // Lógica de Drag & Drop
+        document.body.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        });
+
+        document.body.addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                const file = e.dataTransfer.files[0];
+                const path = file.path;
+                if (path && (path.endsWith('.md') || path.endsWith('.markdown'))) {
+                    window.electronAPI.fileDropped(path);
+                } else {
+                    alert('Solo se admiten archivos Markdown (.md)');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
