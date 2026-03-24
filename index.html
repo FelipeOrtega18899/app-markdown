@@ -1,25 +1,29 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <title>Markdown Editor</title>
+    <!-- Font Awesome para los iconos de SimpleMDE -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <!-- SimpleMDE CSS -->
     <link rel="stylesheet" href="node_modules/simplemde/dist/simplemde.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
     <textarea id="editor"></textarea>
-    
+
     <!-- SimpleMDE JS -->
     <script src="node_modules/simplemde/dist/simplemde.min.js"></script>
     <script>
         // Inicializar SimpleMDE
-        const simplemde = new SimpleMDE({ 
+        const simplemde = new SimpleMDE({
             element: document.getElementById('editor'),
             spellChecker: false, // Opcional: deshabilita el corrector por defecto
             autofocus: true
         });
-        
+
         let currentFilePath = null;
 
         // Limpiar escuchas previas (buena práctica en recargas)
@@ -43,7 +47,7 @@
             currentFilePath = filePath;
             document.title = `Markdown Editor - ${currentFilePath}`;
         });
-        
+
         // Listener para opciones de formato desde el menú
         window.electronAPI.onFormat((event, action) => {
             if (action === 'bold') simplemde.toggleBold();
@@ -71,4 +75,5 @@
         });
     </script>
 </body>
+
 </html>
